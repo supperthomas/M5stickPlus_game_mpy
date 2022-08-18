@@ -29,20 +29,17 @@ gameover=False
 cell=15
 box_column=4
 box_row=0
-song= '0 E5 2 14;4 B4 2 14;6 C5 2 14;8 D5 2 14;10 E5 1 14;11 D5 1 14;12 C5 2 14;14 B4 2 14;16 A4 2 14;20 A4 2 14;22 C5 2 14;24 E5 2 14;28 D5 2 14;30 C5 2 14'   
-st7789_res=0
-st7789_dc=1
-disp_width=240
+disp_width=136
 disp_height=240
 
 
 def newbox():
-    box_id=random.randint(0,6)
-    box_org=boxes[box_id]
+    box_id=random.randint(0,6)  #随机一个方块形状
+    box_org=boxes[box_id]        #获取方块形状数组
     b=[]
     for i in range(len(box_org)):
-        b.append(box_org[i][:])
-    return b
+        b.append(box_org[i][:])    
+    return b                     #返回方块
 box=newbox()
 def clockwise():
     N=len(box)
@@ -54,7 +51,6 @@ def clockwise():
             box[N-j-1][i]=a[i][j]
             
 def counter_clockwise():
-    
     N=len(box)
     a=[]
     for i in range(N):
@@ -85,6 +81,8 @@ def enter():
                 g[j][i]=1
             i+=1
         j+=1
+
+        
 def checkvalid():
     global box_row
     global box_column
@@ -165,7 +163,6 @@ def autodown():
         box=newbox()
         box_column=4
         box_row=0
-        
     enter()
 
 def drawbox():
@@ -177,7 +174,7 @@ def drawbox():
         x=0
         for d in r:
             if d==1:
-                M5Rect(x, y, 15, 15, color[3], 0x10)
+                M5Rect(x, y, cell, cell, color[3], 0x10)
                 #display.rect(x,y,15,15,0x10)
                 #display.fill_rect(x+1,y+1,13,13,color[3])
             x+=cell
@@ -193,7 +190,7 @@ def game():
         #if buttonB.value()==0:
 #         if 1==0:
 #             up()
-#             print("up")
+#             print("g.append([0]*12)up")
 #         elif yValue >40000:
 #             right()
 #             print("right")
@@ -219,6 +216,7 @@ def game():
         if gameover==True:
             #mysong.stop()
             #display.fill(0x0000)
+            setScreenColor(0x000000)
             #display.text(font2,"===GAME===",45,60)
             #display.text(font2,"===OVER===",45,130)
             print("game end")
@@ -251,6 +249,7 @@ def restart():
             g=[]
             for i in range(16):
                 g.append([0]*12)
+            print(g)
             enter()
             game()
 
