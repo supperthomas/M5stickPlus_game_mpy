@@ -4,7 +4,9 @@ from time import sleep_us
 import random
 import framebuf
 from time import sleep
-
+from m5stack import *
+from m5ui import *
+from uiflow import *
 g=[]
 for i in range(16):
     g.append([0]*12)
@@ -72,6 +74,7 @@ def leave():
         j+=1
 
 def enter():
+    print("enter")
     global box_row
     global box_column
     j=box_row
@@ -168,12 +171,13 @@ def autodown():
 def drawbox():
 #     display = hardware.tft
     global color
-#     display.fill(0x0000)
+    setScreenColor(0x0000)
     y=0
     for r in g:
         x=0
         for d in r:
-            #if d==1:
+            if d==1:
+                M5Rect(x, y, 15, 15, color[3], 0x10)
                 #display.rect(x,y,15,15,0x10)
                 #display.fill_rect(x+1,y+1,13,13,color[3])
             x+=cell
@@ -181,26 +185,28 @@ def drawbox():
 
 def game():
     #display = hardware.tft
+    print("game")
     while True:
         xValue=1#xAxis.read_u16()
         yValue=2#yAxis.read_u16()
         f=4
         #if buttonB.value()==0:
-        if 1==0:
-            up()
-            print("up")
-        elif yValue >40000:
-            right()
-            print("right")
-        elif yValue <1000:
-            left()
-            print("left")
-        elif xValue >40000:
-            down()
-            print("down")
-        else:
-            print("stop")
+#         if 1==0:
+#             up()
+#             print("up")
+#         elif yValue >40000:
+#             right()
+#             print("right")
+#         elif yValue <1000:
+#             left()
+#             print("left")
+#         elif xValue >40000:
+#             down()
+#             print("down")
+#         else:
+#             print("stop")
         drawbox()
+        #M5Rect(136-30, 0, 25, 25, 0xec0606, 0xFFFFFF)
         #display.fill_rect(181,0,4,240,color[1])
 #         display.fill_rect(236,0,4,240,color[1])
 #         display.text(font1,"Score",185,20)
@@ -209,11 +215,13 @@ def game():
 #         display.text(font1,"Python",185,150,color[2])
 #         display.text(font1,"Tetris",185,200,color[2])
         autodown()
+        time.sleep(1)
         if gameover==True:
             #mysong.stop()
             #display.fill(0x0000)
             #display.text(font2,"===GAME===",45,60)
             #display.text(font2,"===OVER===",45,130)
+            print("game end")
             time.sleep(1)
             restart()
 def restart():
@@ -225,16 +233,26 @@ def restart():
     #display.text(font2,"A to start",30,130,color=0x7e0)
     #display.text(font2,"Tetris",70,60,color=0x471a)
     #buttonValueB=buttonB.value()
+    setScreenColor(0x111111)
+    label0 = M5TextBox(14, 169, "start game", lcd.FONT_DejaVu18, 0xFFFFFF, rotate=0)
+    rectangle0 = M5Rect(40, 21, 25, 25, 0xec0606, 0xFFFFFF)
+    label1 = M5TextBox(40, 104, "Please", lcd.FONT_Default, 0xFFFFFF, rotate=0)
+    circle0 = M5Circle(100, 34, 12, 0xeae407, 0xe60a0a)
+    label2 = M5TextBox(0, 73, "Welcome to Tetris", lcd.FONT_Default, 0xFFFFFF, rotate=0)
+    label3 = M5TextBox(24, 132, "pulse button ", lcd.FONT_Default, 0xFFFFFF, rotate=0)
     print("hello")
     while True:
         #buttonValueA=buttonA.value()
         #if buttonValueA==0:
-        print("OK")
-        g=[]
-        for i in range(16):
-            g.append([0]*12)
-        enter()
-        game()
+        if (btnA.wasPressed()):
+            M5Led.on()
+            print(".....")
+            setScreenColor(0)
+            g=[]
+            for i in range(16):
+                g.append([0]*12)
+            enter()
+            game()
 
 def main():
     #hardware.init()
