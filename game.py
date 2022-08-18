@@ -219,7 +219,9 @@ def game():
             setScreenColor(0x000000)
             #display.text(font2,"===GAME===",45,60)
             #display.text(font2,"===OVER===",45,130)
+           
             print("game end")
+            print(g)
             time.sleep(1)
             restart()
 def restart():
@@ -249,8 +251,8 @@ def restart():
             g=[]
             for i in range(16):
                 g.append([0]*12)
-            print(g)
             enter()
+            print(g)
             game()
 
 def main():
