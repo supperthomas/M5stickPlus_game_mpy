@@ -7,6 +7,8 @@ from time import sleep
 from m5stack import *
 from m5ui import *
 from uiflow import *
+import imu
+global g
 g=[]
 for i in range(16):
     g.append([0]*12)
@@ -23,14 +25,26 @@ color=[0xFFE0,0x867f,0x7ef,0xfb08]
 score=0
 box_column=4
 box_row=0
-global cell
 global gameover
 gameover=False
-cell=15
+
 box_column=4
 box_row=0
 disp_width=136
 disp_height=240
+
+
+global g_width_pix
+global g_hight_pix
+global g_column
+global g_row
+global g_box_width
+
+g_width_pix = 135
+g_hight_pix = 240
+g_column = 12
+g_row = 16
+g_box_width = 15
 
 
 def newbox():
@@ -174,34 +188,41 @@ def drawbox():
         x=0
         for d in r:
             if d==1:
-                M5Rect(x, y, cell, cell, color[3], 0x10)
+                M5Rect(x, y, g_box_width, g_box_width, color[3], 0x10)
                 #display.rect(x,y,15,15,0x10)
                 #display.fill_rect(x+1,y+1,13,13,color[3])
-            x+=cell
-        y+=cell
+            x+=g_box_width
+        y+=g_box_width
 
 def game():
     #display = hardware.tft
-    print("game")
+
     while True:
-        xValue=1#xAxis.read_u16()
-        yValue=2#yAxis.read_u16()
-        f=4
+        imu0 = imu.IMU()
+        c = imu0.acceleration[0]
+        print("game")
+        print("acceleration[0] x ",c)
+        if c>0 and c > 0.2 :
+            if(c > 0.5):
+                print("fast left")
+            else:
+                print("left")
+        elif c<0 and c < -0.2:
+            if(c < -0.5):
+                print("fast right")
+            else:
+                print("right")
         #if buttonB.value()==0:
-#         if 1==0:
-#             up()
-#             print("g.append([0]*12)up")
-#         elif yValue >40000:
-#             right()
-#             print("right")
-#         elif yValue <1000:
-#             left()
-#             print("left")
-#         elif xValue >40000:
-#             down()
-#             print("down")
-#         else:
-#             print("stop")
+        if btnB.wasPressed():
+            up()
+            print("g.append([0]*12)up")
+        elif c < 0 and c < -0.2:
+            right()
+            print("right")
+        elif c > 0 and c > 0.2:
+            left()
+            print("left")
+
         drawbox()
         #M5Rect(136-30, 0, 25, 25, 0xec0606, 0xFFFFFF)
         #display.fill_rect(181,0,4,240,color[1])
