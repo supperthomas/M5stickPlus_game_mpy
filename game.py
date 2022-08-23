@@ -10,6 +10,8 @@ from uiflow import *
 import imu
 global g_tetris
 g_tetris=[]
+global g_box_download_rate
+g_box_download_rate = 0.5
 
     
 boxo=[[1,1],[1,1]]
@@ -42,10 +44,10 @@ g_width_pix = 135
 g_hight_pix = 240
 #9 16 15
 #13 24 10
-g_column = 9    #  当前 有多少列方块 g_width_pix/15
-g_row = 16      #
-g_box_width = 15  
-box_column=4    # box的当前列
+g_column = 13    #  当前 有多少列方块 g_width_pix/g_box_width
+g_row = 23      #  当前有多少行方块  g_hight_pix/g_box_width
+g_box_width = 10  
+box_column=7    # box的当前列
 
 #color
 color_background = 0x0 
@@ -116,13 +118,10 @@ def checkvalid():
             if d==1:
                 if i<0 or i>=g_column:
                     return False
-                
                 if j<0 or j>=g_row:
                     return False
-                
                 if g_tetris[j][i]==1:
                     return False
-                
             i+=1
         j+=1
     return True
@@ -171,10 +170,9 @@ def clear():
         score +=50*(2**(c-1))
         if score>1000:
             score=999
-        print(score,"a")
+
     
     if 1 in g_tetris[0]:
-        print("===========test========")
         gameover = True
 def autodown():
     global box_row,box_column,box,box_id
@@ -193,18 +191,24 @@ def autodown():
 def drawbox():
     global color
     global g_tetris
+    global box_column
     setScreenColor(0x0000)
     y=0
+    #print(box_column)
+    
     #print("=====drawbox=====")
     #print(g_tetris)
-    
+    title0 = M5Title(title="Score", x=3, fgcolor=0xFFFFFF, bgcolor=0x0000FF)
+    label0 = M5TextBox(86, 0, str(score), lcd.FONT_DejaVu18, 0xFFFFFF, rotate=0)
+
     for r in g_tetris:
         x=0
         for d in r:
             if d==1:
-                M5Rect(x, y, g_box_width, g_box_width, color[3], 0x10)
-                #display.rect(x,y,15,15,0x10)
-                #display.fill_rect(x+1,y+1,13,13,color[3])
+                #cheat
+                #if x == box_column * g_box_width :
+                    #M5Line(M5Line.PLINE, x, y, x, 240, 0xFFFFFF)
+                M5Rect(x, y, g_box_width, g_box_width, color[3], 0x0640f7)
                 #print('draw box x:%d y:%d'%(x,y))
             x+=g_box_width
         y+=g_box_width
@@ -212,50 +216,57 @@ def drawbox():
 def game():
     global gameover
     global g_tetris
+    global g_box_download_rate
     while True:
         imu0 = imu.IMU()
-        c = imu0.acceleration[0]
-        print("=====box_column=before====",box_column)
-
-        if btnB.wasPressed():
+        x = imu0.acceleration[0]
+        z = imu0.acceleration[2]
+        if btnA.wasPressed():
             up()
             print("up box changed")
-        elif c < 0 and c < -0.2:
+        elif x < 0 and x < -0.2:
             right()
-#             print("right")
-        elif c > 0 and c > 0.2:
+        elif x > 0 and x > 0.2:
             left()
-#             print("left")
-        print("=====box_column=after====",box_column)
+        if z < 0.7 and z > -0.7:
+            g_box_download_rate = 0.1
+        else:
+            g_box_download_rate = 0.5
+             
 
         drawbox()
         autodown()
-        time.sleep(0.5)
+        time.sleep(g_box_download_rate)
         if gameover==True:
-            #mysong.stop()
-            #display.fill(0x0000)
             setScreenColor(0x000000)
-            #display.text(font2,"===GAME===",45,60)
-            #display.text(font2,"===OVER===",45,130)
-            print("game end")
-            #print(g_tetris)
-            time.sleep(0.2)
+            title0 = M5Title(title="Score", x=3, fgcolor=0xFFFFFF, bgcolor=0x0000FF)
+            label0 = M5TextBox(86, 0, str(score), lcd.FONT_DejaVu18, 0xFFFFFF, rotate=0)
+            label1 = M5TextBox(36, 60, "Game", lcd.FONT_Comic, 0xFFFFFF, rotate=0)
+            label2 = M5TextBox(36, 107, "Over", lcd.FONT_Comic, 0xFFFFFF, rotate=0)
+            label3 = M5TextBox(10, 188, "Press M5 button ", lcd.FONT_Default, 0xFFFFFF, rotate=0)
+            label4 = M5TextBox(33, 211, "To Restart", lcd.FONT_Default, 0xFFFFFF, rotate=0)
+            while True:
+                if (btnA.wasPressed()):
+                    time.sleep(1)
+                    break;
             gameover = False
             restart()
+            
 def restart():
     global g_tetris
+    
     setScreenColor(0)
+    
     label0 = M5TextBox(14, 169, "start game", lcd.FONT_DejaVu18, 0xFFFFFF, rotate=0)
     rectangle0 = M5Rect(40, 21, 25, 25, 0xec0606, 0xFFFFFF)
     label1 = M5TextBox(40, 104, "Please", lcd.FONT_Default, 0xFFFFFF, rotate=0)
     circle0 = M5Circle(100, 34, 12, 0xeae407, 0xe60a0a)
     label2 = M5TextBox(0, 73, "Welcome to Tetris", lcd.FONT_Default, 0xFFFFFF, rotate=0)
-    label3 = M5TextBox(24, 132, "pulse button ", lcd.FONT_Default, 0xFFFFFF, rotate=0)
+    label3 = M5TextBox(24, 132, "press B button ", lcd.FONT_Default, 0xFFFFFF, rotate=0)
     print("hello")
     while True:
         if (btnA.wasPressed()):
             M5Led.on()
-            print(".....")
             setScreenColor(0)
             g_tetris.clear()
             for i in range(g_row):
@@ -267,8 +278,6 @@ def restart():
 
 def main():
     global g_tetris
-    #hardware.init()
-    #hardware.tft.fill(st7789.BLUE)
     for i in range(16):
         g_tetris.append([0]*g_column)
     restart()
